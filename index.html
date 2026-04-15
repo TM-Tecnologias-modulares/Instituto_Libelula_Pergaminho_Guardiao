@@ -561,9 +561,175 @@
     .main { padding: 20px; }
     .header-controls { width: 100%; justify-content: flex-start; }
   }
+
+  /* ============================================================
+     GATE SCREEN — Senha de entrada
+     ============================================================ */
+  .gate-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #070810;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 1.5s ease, transform 1.5s ease;
+  }
+  .gate-overlay.dissolving {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+  }
+  .gate-overlay.hidden { display: none; }
+
+  /* Particles */
+  .gate-particles {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .gate-particle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: rgba(124, 110, 240, 0.6);
+    border-radius: 50%;
+    animation: particleFloat linear infinite;
+  }
+  @keyframes particleFloat {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+  .gate-overlay.dissolving .gate-particle {
+    animation: particleRise 1.5s ease-out forwards;
+  }
+  @keyframes particleRise {
+    to { transform: translateY(-30vh) scale(0); opacity: 0; }
+  }
+
+  /* Gate content */
+  .gate-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 400px;
+    padding: 0 24px;
+  }
+  .gate-icon {
+    font-size: 64px;
+    margin-bottom: 24px;
+    animation: gateGlow 3s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes gateGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(124, 110, 240, 0.3)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 20px rgba(124, 110, 240, 0.7)); transform: scale(1.05); }
+  }
+  .gate-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #e4e6f0;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .gate-subtitle {
+    font-size: 13px;
+    color: #8b8fa8;
+    margin-bottom: 32px;
+  }
+  .gate-input-wrap {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .gate-input {
+    width: 100%;
+    padding: 14px 48px 14px 18px;
+    background: rgba(26, 29, 39, 0.8);
+    border: 1px solid #2d3148;
+    border-radius: 12px;
+    color: #e4e6f0;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    letter-spacing: 2px;
+  }
+  .gate-input:focus {
+    border-color: #7c6ef0;
+    box-shadow: 0 0 0 3px rgba(124, 110, 240, 0.2);
+  }
+  .gate-input::placeholder { letter-spacing: 0; color: #555; }
+  .gate-enter-btn {
+    position: absolute;
+    right: 6px; top: 50%; transform: translateY(-50%);
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: #7c6ef0;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gate-enter-btn:hover { background: #5b4cc4; }
+  .gate-error {
+    color: #f87171;
+    font-size: 13px;
+    min-height: 20px;
+    transition: opacity 0.3s;
+  }
+
+  /* Welcome reveal */
+  .gate-welcome {
+    display: none;
+    text-align: center;
+  }
+  .gate-welcome.active { display: block; }
+  .gate-welcome-text {
+    font-size: 20px;
+    font-weight: 300;
+    color: #e4e6f0;
+    line-height: 1.6;
+    opacity: 0;
+    animation: welcomeFadeIn 2s ease forwards;
+  }
+  @keyframes welcomeFadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .gate-welcome-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: welcomeFadeIn 2s ease 0.3s forwards;
+  }
 </style>
 </head>
 <body>
+
+<!-- GATE SCREEN -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-particles" id="gateParticles"></div>
+  <div class="gate-content" id="gateContent">
+    <div class="gate-icon">🦋</div>
+    <div class="gate-title">Instituto Libélula</div>
+    <div class="gate-subtitle">Pergaminho do Guardião</div>
+    <div class="gate-input-wrap">
+      <input type="password" class="gate-input" id="gateInput" placeholder="Digite a senha de acesso" autocomplete="off">
+      <button class="gate-enter-btn" onclick="checkGate()">→</button>
+    </div>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+  <div class="gate-welcome" id="gateWelcome">
+    <div class="gate-welcome-icon">🌿</div>
+    <div class="gate-welcome-text">Seja a mudança que você deseja ver<br>na sua própria caminhada</div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-left">
     <div class="header-icon">📜</div>
@@ -1353,6 +1519,63 @@ ${setSaveIndicator.toString()}
   URL.revokeObjectURL(url);
 }
 
+// ============================================================
+// GATE — Tela de senha
+// ============================================================
+const GATE_PASSWORD = 'Ldelibelula';
+
+function initGate() {
+  if (sessionStorage.getItem('gate_unlocked')) {
+    document.getElementById('gateOverlay').classList.add('hidden');
+    return;
+  }
+  // Generate particles
+  const container = document.getElementById('gateParticles');
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'gate-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (4 + Math.random() * 8) + 's';
+    p.style.animationDelay = (Math.random() * 6) + 's';
+    p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+    const hue = Math.random() > 0.5 ? '270' : '180';
+    p.style.background = `hsla(${hue}, 60%, 70%, ${0.3 + Math.random() * 0.4})`;
+    container.appendChild(p);
+  }
+  // Enter key support
+  document.getElementById('gateInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') checkGate();
+  });
+}
+
+function checkGate() {
+  const input = document.getElementById('gateInput');
+  const error = document.getElementById('gateError');
+  if (input.value === GATE_PASSWORD) {
+    error.textContent = '';
+    sessionStorage.setItem('gate_unlocked', '1');
+    // Show welcome message
+    document.getElementById('gateContent').style.display = 'none';
+    const welcome = document.getElementById('gateWelcome');
+    welcome.classList.add('active');
+    // Dissolve after 3s
+    setTimeout(() => {
+      document.getElementById('gateOverlay').classList.add('dissolving');
+      setTimeout(() => {
+        document.getElementById('gateOverlay').classList.add('hidden');
+      }, 1500);
+    }, 3000);
+  } else {
+    error.textContent = 'Senha incorreta';
+    input.value = '';
+    input.focus();
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+initGate();
 // Render immediately, then load from JSONBin in background
 renderAll();
 loadData();
