@@ -559,7 +559,19 @@
     .layout { flex-direction: column; height: auto; }
     .sidebar { width: 100%; min-width: unset; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
     .main { padding: 20px; }
-    .header-controls { width: 100%; justify-content: flex-start; }
+    .header { padding: 12px 16px; }
+    .header-left { min-width: unset; flex: unset; }
+    .header h1 { font-size: 16px; }
+    .header-subtitle { display: none; }
+    .header-controls { width: 100%; justify-content: flex-start; gap: 6px; }
+    .hdr-btn { padding: 5px 10px; font-size: 11px; }
+    .save-status { font-size: 14px; }
+
+    /* Gate mobile */
+    .gate-icon svg { width: 60px; height: 60px; }
+    .gate-title { font-size: 18px; }
+    .gate-input { font-size: 16px; padding: 12px 44px 12px 14px; }
+    .gate-welcome-text { font-size: 16px; padding: 0 20px; }
   }
 
   /* ============================================================
@@ -1579,9 +1591,10 @@ function initGate() {
     document.getElementById('gateOverlay').classList.add('hidden');
     return;
   }
-  // Generate particles
+  // Generate particles (fewer on mobile)
   const container = document.getElementById('gateParticles');
-  for (let i = 0; i < 40; i++) {
+  const particleCount = window.innerWidth < 768 ? 18 : 40;
+  for (let i = 0; i < particleCount; i++) {
     const p = document.createElement('div');
     p.className = 'gate-particle';
     p.style.left = Math.random() * 100 + '%';
