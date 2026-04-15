@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pergaminho do Guardião — Instituto Libélula</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2d3148;
+    --text: #e4e6f0;
+    --text2: #8b8fa8;
+    --accent: #7c6ef0;
+    --accent2: #5b4cc4;
+    --green: #4ade80;
+    --orange: #fb923c;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --edit-highlight: #7c6ef033;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1040 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 280px;
+  }
+  .header-icon { font-size: 28px; }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header-subtitle { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .save-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .save-indicator.saving { color: var(--orange); }
+  .save-indicator.saved { color: var(--green); }
+  .save-indicator.unsaved { color: var(--red); }
+  .hdr-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .hdr-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .hdr-btn.danger:hover { background: var(--red); border-color: var(--red); }
+  .hdr-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .hdr-btn.primary:hover { background: var(--accent2); }
+  .save-status {
+    font-size: 16px;
+    font-weight: 700;
+    transition: color 0.3s;
+    margin-right: 2px;
+  }
+  .save-status.saved { color: var(--green); }
+  .save-status.saving { color: var(--orange); }
+  .save-status.unsaved { color: var(--red); }
+  .hdr-btn.save { background: #166534; border-color: #166534; color: #fff; }
+  .hdr-btn.save:hover { background: #15803d; border-color: #15803d; }
+  .hdr-btn.save:active { background: #14532d; }
+
+  /* LAYOUT */
+  .layout {
+    display: flex;
+    height: calc(100vh - 85px);
+  }
+
+  /* SIDEBAR STEPS */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .sidebar-steps {
+    flex: 1;
+    overflow-y: auto;
+  }
+  .step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-left: 3px solid transparent;
+    position: relative;
+  }
+  .step-item:hover { background: var(--surface2); }
+  .step-item.active {
+    background: var(--surface2);
+    border-left-color: var(--accent);
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+    flex-shrink: 0;
+    color: var(--text2);
+    transition: background 0.3s;
+  }
+  .step-item.active .step-num { background: var(--accent); color: #fff; }
+  .step-info h3 { font-size: 14px; font-weight: 500; line-height: 1.3; }
+  .step-info span { font-size: 11px; color: var(--text2); }
+  .step-item.active .step-info h3 { color: #fff; }
+  .sidebar-add {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .add-step-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .add-step-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--surface2); }
+
+  /* MAIN CONTENT */
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 40px;
+  }
+
+  .step-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .step-title {
+    font-size: 28px;
+    font-weight: 700;
+    flex: 1;
+  }
+  .step-title-row .delete-step-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.2s;
+    opacity: 0;
+  }
+  .step-title-row:hover .delete-step-btn { opacity: 1; }
+  .step-title-row .delete-step-btn:hover { color: var(--red); border-color: var(--red); background: #2a1515; }
+  .step-timing {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 24px;
+  }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .section:hover { border-color: #3d4168; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex: 1;
+  }
+  .section-delete-btn {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text2);
+    transition: all 0.2s;
+    opacity: 0;
+  }
+  .section:hover .section-delete-btn { opacity: 1; }
+  .section-delete-btn:hover { color: var(--red); border-color: var(--red); }
+
+  /* TRIGGER / CONDIÇÃO */
+  .trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+
+  /* MESSAGE BOX */
+  .msg-box {
+    background: #0b0e14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    position: relative;
+    margin-bottom: 12px;
+  }
+  .msg-box p {
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: var(--text);
+  }
+  .msg-label {
+    font-size: 11px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 2;
+  }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
+  .copy-btn.copied { background: var(--green); color: #000; }
+
+  /* ACTION LIST */
+  .action-list { list-style: none; }
+  .action-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .action-list li::before {
+    content: "\2192";
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .add-item-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border: 1px dashed var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .add-item-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .action-list li .remove-item-btn {
+    margin-left: auto;
+    padding: 2px 6px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .action-list li:hover .remove-item-btn { opacity: 1; }
+  .action-list li .remove-item-btn:hover { color: var(--red); }
+
+  /* FAQ ACCORDION */
+  .faq-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+  .faq-item:hover { border-color: var(--accent2); }
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--surface2);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .faq-question:hover { background: #2a2e42; }
+  .faq-arrow {
+    transition: transform 0.3s;
+    color: var(--text2);
+    font-size: 12px;
+  }
+  .faq-item.open .faq-arrow { transform: rotate(90deg); }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+  .faq-item.open .faq-answer {
+    max-height: 2000px;
+    padding: 16px 18px;
+  }
+  .faq-answer p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+  .faq-answer .copy-btn-float {
+    display: inline-block;
+    margin-top: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .faq-answer .copy-btn-float:hover { background: var(--accent); color: #fff; }
+
+  /* NOTE / ALERT */
+  .note {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .note-warn { background: #2a2210; border: 1px solid #4a3a10; color: var(--orange); }
+  .note-info { background: #0f1a2e; border: 1px solid #1a2a4a; color: var(--blue); }
+  .note-green { background: #0f2a1a; border: 1px solid #1a4a2a; color: var(--green); }
+
+  /* EDITABLE HIGHLIGHT */
+  [contenteditable="true"] {
+    outline: none;
+    border-radius: 4px;
+    transition: background 0.2s, box-shadow 0.2s;
+    cursor: text;
+  }
+  [contenteditable="true"]:hover {
+    background: var(--edit-highlight);
+  }
+  [contenteditable="true"]:focus {
+    background: var(--edit-highlight);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  /* ADD SECTION BUTTON */
+  .add-section-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .add-section-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--surface); }
+
+  /* SECTION TYPE SELECTOR */
+  .section-type-picker {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .section-type-picker span {
+    font-size: 13px;
+    color: var(--text2);
+    margin-right: 4px;
+  }
+  .type-opt {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .type-opt:hover, .type-opt.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .type-opt-cancel {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    margin-left: auto;
+    transition: all 0.2s;
+  }
+  .type-opt-cancel:hover { color: var(--red); border-color: var(--red); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    min-width: 360px;
+    max-width: 480px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+  .modal label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; margin-top: 12px; }
+  .modal input, .modal select {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+  }
+  .modal input:focus, .modal select:focus { outline: none; border-color: var(--accent); }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  .icon-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .icon-opt {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.2s;
+  }
+  .icon-opt:hover, .icon-opt.selected { border-color: var(--accent); background: var(--accent); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; height: auto; }
+    .sidebar { width: 100%; min-width: unset; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+    .main { padding: 20px; }
+    .header-controls { width: 100%; justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">📜</div>
+    <div>
+      <h1>Pergaminho do Guardião</h1>
+      <div class="header-subtitle">Instituto Libélula — Roadmap da Jornada do Participante</div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <span class="save-status saved" id="saveStatus">✓</span>
+    <button class="hdr-btn save" onclick="manualSave()">Salvar na nuvem</button>
+    <button class="hdr-btn primary" onclick="exportHTML()">Exportar HTML</button>
+  </div>
+</div>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-steps" id="sidebar">
+      <div class="step-item" data-step="0" onclick="goToStep(0)">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <h3>👋 Boas-vindas</h3>
+          <span>Primeiro contato</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="1" onclick="goToStep(1)">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <h3>✅ Confirmação de interesse</h3>
+          <span>Após boas-vindas</span>
+        </div>
+      </div>
+      <div class="step-item active" data-step="2" onclick="goToStep(2)">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <h3>❓ FAQ — Dúvidas Frequentes</h3>
+          <span>Reativo — só quando perguntam</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="3" onclick="goToStep(3)">
+        <div class="step-num">4</div>
+        <div class="step-info">
+          <h3>📋 Anamnese</h3>
+          <span>Pessoa confirmou interesse em participar</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="4" onclick="goToStep(4)">
+        <div class="step-num">5</div>
+        <div class="step-info">
+          <h3>💰 Pagamento + Lista do Ritual</h3>
+          <span>Anamnese preenchida</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="5" onclick="goToStep(5)">
+        <div class="step-num">6</div>
+        <div class="step-info">
+          <h3>🌿 Guia de Preparação</h3>
+          <span>3 dias antes do ritual (D-3)</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="6" onclick="goToStep(6)">
+        <div class="step-num">7</div>
+        <div class="step-info">
+          <h3>🔥 Dia do Ritual</h3>
+          <span>Sábado, 18h</span>
+        </div>
+      </div>
+      <div class="step-item " data-step="7" onclick="goToStep(7)">
+        <div class="step-num">8</div>
+        <div class="step-info">
+          <h3>🌱 Pós-Vivência</h3>
+          <span>D+1 (dia seguinte ao ritual)</span>
+        </div>
+      </div></div>
+    <div class="sidebar-add">
+      <button class="add-step-btn" onclick="openNewStepModal()">+ Novo Passo</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+    <div class="step-title-row">
+      <div class="step-title">❓ FAQ — Dúvidas Frequentes</div>
+      <button class="delete-step-btn" onclick="deleteStep(2)">Remover passo</button>
+    </div>
+    <div class="step-timing">⏱ Reativo — só quando perguntam</div>
+      <div class="trigger section-editable" contenteditable="true" data-step="2" data-sec="0" data-field="text" onblur="syncEdit(this) onfocus=" this.dataset.before="this.innerText&quot;">⚡ Gatilho: Participante faz uma pergunta sobre o ritual, Ayahuasca, preparo, etc.</div>
+      <div class="section">
+        <div class="section-header">
+          <button class="section-delete-btn" onclick="deleteSection(2,1)">Remover</button>
+        </div>
+        <div class="note note-warn section-editable" contenteditable="true" data-step="2" data-sec="1" data-field="text" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">📌 REGRA DE OURO — Zero condicionamento. Nunca dizer o que a pessoa vai sentir. Explicar conceitos de forma acolhedora, mas sem afirmar que vão acontecer. Se tiver dúvida sobre o que incluir, perguntar ao Thiago.</div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">FAQ</div>
+          <button class="section-delete-btn" onclick="deleteSection(2,2)">Remover</button>
+        </div>
+        
+          <div class="faq-item" id="faq-2-2-0">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-0')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="0" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">O que é o Soundhealing?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="0" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">O Soundhealing (Terapia Sonora): A Afinação do Corpo
+
+O som não passa apenas pelos ouvidos; ele viaja através da água e dos ossos do nosso corpo. A nossa imersão inicial com a terapia sonora é o alicerce do relaxamento.
+- Sincronização de Ondas Cerebrais: As frequências acústicas dos instrumentos (como taças, tambores e didgeridoo) guiam o cérebro a sair do estado de alerta (ondas Beta) para estados de relaxamento profundo e meditação (ondas Alpha e Theta).
+- Alívio do Estresse: A vibração física do som atua massageando o sistema nervoso. Isso reduz drasticamente os níveis de cortisol (hormônio do estresse), preparando o seu terreno interno de forma calma e segura para o recebimento das outras medicinas.
+- Ancoragem: Durante o pico da Força, o som contínuo e rítmico serve como uma "corda de segurança". Ele beneficia o participante ao oferecer um ponto de referência confiável para onde a mente pode retornar caso se sinta confusa ou sobrecarregada.
+
+
+
+
+Imagina que o seu corpo é como um instrumento.
+Com o tempo, com a rotina, com o estresse… ele vai meio que "desafinando".
+
+O Soundhealing é um momento onde você se deita, fecha os olhos e permite que os sons ajudam o seu corpo a se reorganizar, do jeito dele.
+Não precisa acreditar em nada. Não precisa fazer esforço.
+É mais como entrar em um ambiente onde o som cria um espaço… e o seu corpo responde como precisar naquele momento.
+Algumas pessoas relaxam, outras ficam mais conscientes, outras só aproveitam o silêncio entre os sons.
+Cada experiência é única. É menos sobre entender… e mais sobre sentir.</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-1">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-1')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="1" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">Como é a cerimônia com o Tuï?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="1" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">O Tuï é da etnia Shanenawa, cacique da aldeia Manuithi.
+
+Ele traz a ancestralidade, os rezos do pai (que é pajé) e a história de vida dele como indígena.
+
+Não é apenas um ritual — é uma vivência de aldeia. Uma oportunidade de entrar em contato com uma sabedoria que vem de gerações.
+
+O Tuï e a Paka Shane Huya conduzem com muito amor e respeito.</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-2">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-2')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="2" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">O que é Ayahuasca?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="2" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">🌿A Medicina da Ayahuasca: Expansão e Reprocessamento
+
+A Ayahuasca atua como uma ponte direta para o seu mundo interior. Seus maiores benefícios não estão em "ver coisas", mas sim na clareza profunda que ela proporciona após o trabalho.
+- Reprocessamento Emocional: Ajuda a acessar e ressignificar memórias, crenças limitantes e emoções estagnadas, permitindo que você olhe para a própria vida a partir de uma nova perspectiva, com mais compaixão e menos julgamento.
+- Liberação Somática: Muitas vezes o corpo guarda tensões e traumas que a mente já esqueceu. A medicina promove uma varredura física, auxiliando o corpo a liberar essas tensões (seja através de tremores, bocejos, choro ou purgas), trazendo uma sensação de extrema leveza e renovação física nos dias seguintes.
+- Clareza de Propósito: Ao silenciar as vozes externas e as pressões do dia a dia, a medicina afina a sua intuição, ajudando a organizar pensamentos confusos e a tomar decisões mais alinhadas com a sua verdadeira essência.
+A Ayahuasca é uma medicina ancestral utilizada por povos indígenas da Amazônia há séculos.
+
+É preparada a partir de duas plantas e utilizada em rituais sagrados como ferramenta de autoconhecimento, cura e conexão.
+No Instituto Libélula, a consagramos com respeito, intenção e cuidado. Cada vivência é única — e é exatamente por isso que não dizemos o que você vai sentir. A jornada é sua.
+</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-3">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-3')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="3" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">O que eu preciso levar?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="3" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Para garantir seu conforto durante toda a noite:
+
+• Colchonete, travesseiro e cobertor BEM quente (a chácara esfria à noite)
+• Agasalho e meias grossas
+• Roupas confortáveis, preferencialmente claras (calças largas, saias longas — nada que aperte a cintura)
+• Garrafa d'água
+• Repelente
+• Caderno e caneta (opcional — para anotar insights)
+• Itens para o altar (opcional — cristais, fotos de ancestrais, objetos de poder)</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-4">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-4')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="4" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">O que são os preceitos / dieta?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="4" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">A medicina começa a agir muito antes da consagração.
+Nos 3 dias que antecedem o ritual:
+
+• Alimentação limpa — sem carnes (especialmente vermelha e porco), frituras, açúcar e ultraprocessados
+• Zero álcool e drogas — estritamente necessário
+• Resguardo sexual — direcionar a vitalidade para o processo de cura
+• Jejum de informação — evitar notícias pesadas, filmes violentos, conflitos
+
+No dia do ritual:
+• Refeições leves (frutas, saladas, sopas ralas)
+• Jejum de sólidos entre 14h e 15h (impreterivelmente)
+• Manter-se hidratado com água ou chás naturais
+
+⚠️ Mandar avisos no grupo com 1 semana de antecedencia - 3x na semana
+</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-5">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-5')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="5" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">O que é Rapé e Sananga?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="5" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">- A Medicina do Rapé: Aterramento e Silêncio Mental
+
+O Rapé é a medicina da presença absoluta. Ele atua como um ancoradouro seguro quando a mente tenta fugir para o passado ou para o futuro.
+- Aterramento Imediato: O principal benefício do Rapé é trazer a sua energia vital diretamente para o corpo e para o chão (aterramento). Ele corta padrões de pensamentos repetitivos e acelerados, essenciais para o controle da ansiedade.
+- Foco e Centramento: Ao limpar o campo mental, ele gera um estado de alerta relaxado. Você se sente desperto, focado no momento presente e totalmente consciente do seu corpo e da sua respiração.
+- Desobstrução: Fisicamente, atua na limpeza das vias respiratórias e no alívio de tensões acumuladas na região da cabeça, pescoço e ombros, facilitando uma respiração mais profunda e fluida.
+
+
+A Medicina da Sananga: Limpeza e Resiliência
+A Sananga é a medicina do "fogo frio". O benefício dela está exatamente em ensinar o corpo a relaxar diante do desconforto.
+- Reset do Sistema Nervoso: O ardor intenso dos primeiros minutos atua como um "choque" de presença. Quando o pico passa, o sistema nervoso parassimpático é ativado, gerando um relaxamento muscular profundo, quase como se o corpo inteiro "suspirasse".
+- Desbloqueio Emocional: Os olhos são janelas emocionais. O estímulo da Sananga frequentemente ajuda a liberar lágrimas contidas e tristezas não processadas, lavando a alma e trazendo uma sensação de alívio imediato.
+- Clareza Visual e Mental: Além de benefícios tradicionais para a saúde ocular (prevenção e alívio de cansaço visual), ela promove o que chamamos de "visão clara", dissolvendo a confusão mental e melhorando o foco interno.
+
+• Rapé e Sananga são medicinas de poder tradicionais dos povos indígenas.
+Ambas são oferecidas durante a vivência como parte da cerimônia.
+</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-6">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-6')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="6" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">Qual o valor e como funciona o pagamento?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="6" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Valor de Troca:
+
+• Antecipado (até 1 dia antes do ritual): R$ 180,00 no Pix | R$ 204,45 no cartão em até 3x
+• No dia da vivência: R$ 210,00 no Pix | R$ 238,53 no cartão em até 3x
+
+Chave Pix: institut8libelula@gmail.com
+Inclui: consagração, sopinha reconfortante na madrugada e dormir no espaço.
+
+As vagas são limitadas para mantermos o acolhimento e a intimidade do nosso ninho 🦋</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-7">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-7')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="7" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">Posso cancelar? Como funciona o reembolso?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="7" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Política de Cancelamento:
+
+• Até 7 dias antes do ritual: 100% reembolso (descontando taxas de cartão, se aplicável)
+• De 6 a 3 dias antes: 50% reembolso ou 100% como crédito para a próxima vivência
+• Menos de 48h ou ausência no dia: sem reembolso e sem crédito
+
+⚠️ ESSA POLÍTICA AINDA PRECISA SER CONFIRMADA PELO THIAGO.</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+          <div class="faq-item" id="faq-2-2-8">
+            <div class="faq-question" onclick="toggleFaq('faq-2-2-8')">
+              <span contenteditable="true" data-step="2" data-sec="2" data-field="faq-q" data-item="8" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">Onde fica e como chegar?</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="2" data-sec="2" data-field="faq-a" data-item="8" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">📍 Chácara Aurora Austral
+Piedade/SP
+Como chegar na chácara
+
+Escreva Chácara Aurora Austral no Waze ou sistema de navegação de sua preferência.
+Adicionar como ponto ou rota de parada o Bar do Miro para você chegar aqui pela melhor opção de estrada.
+
+Google:
+https://maps.app.goo.gl/VYiBzFcBqaNxE9Am9?g_st=ipc
+
+Waze:
+Use o Waze para dirigir até Chácara Aurora Austral, SP: https://waze.com/ul/h6gy2c973x
+
+Ps.: Não tem sinal de celular nas redondezas. 
+Vou deixar aqui a senha da rede Wi-Fi do Bar do Miro.
+Nome da Rede: Bardomiro_clientes
+Senha: bardomiro
+Horário: 18h (sábado)
+</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title section-editable" contenteditable="true" data-step="2" data-sec="3" data-field="title" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Após tirar as dúvidas</div>
+          <button class="section-delete-btn" onclick="deleteSection(2,3)">Remover</button>
+        </div>
+        <ul class="action-list">
+          
+            <li>
+              <span contenteditable="true" data-step="2" data-sec="3" data-field="content" data-item="0" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Verificar se a pessoa quer participar</span>
+              <button class="remove-item-btn" onclick="removeListItem(2,3,0)">✕</button>
+            </li>
+            <li>
+              <span contenteditable="true" data-step="2" data-sec="3" data-field="content" data-item="1" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Se sim → Passo 4 (Anamnese)</span>
+              <button class="remove-item-btn" onclick="removeListItem(2,3,1)">✕</button>
+            </li>
+            <li>
+              <span contenteditable="true" data-step="2" data-sec="3" data-field="content" data-item="2" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">Se ainda em dúvida → dar espaço, não pressionar</span>
+              <button class="remove-item-btn" onclick="removeListItem(2,3,2)">✕</button>
+            </li>
+        </ul>
+        <button class="add-item-btn" onclick="addListItem(2,3)">+ item</button>
+      </div>
+    <div id="sectionPicker-2"></div>
+    <button class="add-section-btn" onclick="showSectionTypePicker(2)">+ Adicionar seção</button><div style="display:flex;gap:12px;margin-top:24px;"><button onclick="goToStep(1)" style="padding:10px 20px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;font-size:14px;">← Passo 2</button><button onclick="goToStep(3)" style="padding:10px 20px;background:var(--accent);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:14px;">Passo 4 →</button></div></div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+<script>
+// EXPORTED DATA
+const ORIGINAL_STEPS = [{"id":1,"title":"Boas-vindas","timing":"Primeiro contato","icon":"👋","sections":[{"type":"trigger","text":"Pessoa interessada entra em contato pelo Instagram, WhatsApp ou indicação"},{"type":"note","variant":"info","text":"Thiago dá as boas-vindas pessoalmente. Depois disso, o guardião assume o fluxo prático. Modelo híbrido."},{"type":"section","title":"Ação do Thiago","content":["Receber a pessoa com atenção e presença","Dar boas-vindas de forma pessoal","Passar o contato para o fluxo do guardião"]},{"type":"note","variant":"green","text":"O que funciona bem segundo o Thiago: \"Dar atenção e presença para as pessoas.\" Isso é inegociável — o primeiro contato é humano, sempre."},{"type":"message","label":"Mensagem sugerida — Thiago entrega ao guardião","text":"Fala, [NOME]! Que bom que você chegou até aqui 🌿\n\nSou o Thiago, do Instituto Libélula. Fico feliz com o seu interesse em participar das nossas vivências.\n\nVou te passar para o [NOME DO GUARDIÃO] que vai te acompanhar com todas as informações, combinado?\n\nJá adianto: você tá num lugar seguro. Bem-vindo(a) ao ninho 🦋"},{"type":"section","title":"Próximo passo","content":["Esperar a pessoa responder / confirmar recebimento","Avançar para o Passo 2 (Confirmação de interesse)"]}]},{"id":2,"title":"Confirmação de interesse","timing":"Após boas-vindas","icon":"✅","sections":[{"type":"trigger","text":"Participante responde ao contato inicial demonstrando interesse"},{"type":"message","label":"Guardião envia","text":"Fala, [NOME]! Tudo bem?\n\nO Thiago me pediu pra te acompanhar daqui pra frente.\n\nPra gente começar, me conta:\n• Você já participou de algum ritual com Ayahuasca antes?\n• Tem alguma dúvida específica que quer tirar antes de decidir?\n\nFique tranquilo(a) pra perguntar o que quiser. Estou aqui pra isso 🙏"},{"type":"note","variant":"warn","text":"NÃO avançar para o próximo passo sem a pessoa confirmar interesse. O fluxo é etapa por etapa, respeitando o tempo dela."},{"type":"section","title":"Se a pessoa tiver dúvidas","content":["Ir para o FAQ (Passo 3) — reativo, só o que ela perguntar","Responder com as respostas prontas do Pergaminho","Nunca criar expectativas sobre o que ela vai sentir"]},{"type":"section","title":"Se a pessoa já quiser participar","content":["Pular para o Passo 4 (Anamnese)","Não forçar FAQ se ela não perguntou nada"]}]},{"id":3,"title":"FAQ — Dúvidas Frequentes","timing":"Reativo — só quando perguntam","icon":"❓","sections":[{"type":"trigger","text":"Participante faz uma pergunta sobre o ritual, Ayahuasca, preparo, etc."},{"type":"note","variant":"warn","text":"REGRA DE OURO — Zero condicionamento. Nunca dizer o que a pessoa vai sentir. Explicar conceitos de forma acolhedora, mas sem afirmar que vão acontecer. Se tiver dúvida sobre o que incluir, perguntar ao Thiago."},{"type":"faq","items":[{"q":"O que é o Soundhealing?","a":"O Soundhealing (Terapia Sonora): A Afinação do Corpo\n\nO som não passa apenas pelos ouvidos; ele viaja através da água e dos ossos do nosso corpo. A nossa imersão inicial com a terapia sonora é o alicerce do relaxamento.\n- Sincronização de Ondas Cerebrais: As frequências acústicas dos instrumentos (como taças, tambores e didgeridoo) guiam o cérebro a sair do estado de alerta (ondas Beta) para estados de relaxamento profundo e meditação (ondas Alpha e Theta).\n- Alívio do Estresse: A vibração física do som atua massageando o sistema nervoso. Isso reduz drasticamente os níveis de cortisol (hormônio do estresse), preparando o seu terreno interno de forma calma e segura para o recebimento das outras medicinas.\n- Ancoragem: Durante o pico da Força, o som contínuo e rítmico serve como uma \"corda de segurança\". Ele beneficia o participante ao oferecer um ponto de referência confiável para onde a mente pode retornar caso se sinta confusa ou sobrecarregada.\n\n\n\n\nImagina que o seu corpo é como um instrumento.\nCom o tempo, com a rotina, com o estresse… ele vai meio que \"desafinando\".\n\nO Soundhealing é um momento onde você se deita, fecha os olhos e permite que os sons ajudam o seu corpo a se reorganizar, do jeito dele.\nNão precisa acreditar em nada. Não precisa fazer esforço.\nÉ mais como entrar em um ambiente onde o som cria um espaço… e o seu corpo responde como precisar naquele momento.\nAlgumas pessoas relaxam, outras ficam mais conscientes, outras só aproveitam o silêncio entre os sons.\nCada experiência é única. É menos sobre entender… e mais sobre sentir."},{"q":"Como é a cerimônia com o Tuï?","a":"O Tuï é da etnia Shanenawa, cacique da aldeia Manuithi.\n\nEle traz a ancestralidade, os rezos do pai (que é pajé) e a história de vida dele como indígena.\n\nNão é apenas um ritual — é uma vivência de aldeia. Uma oportunidade de entrar em contato com uma sabedoria que vem de gerações.\n\nO Tuï e a Paka Shane Huya conduzem com muito amor e respeito."},{"q":"O que é Ayahuasca?","a":"🌿A Medicina da Ayahuasca: Expansão e Reprocessamento\n\nA Ayahuasca atua como uma ponte direta para o seu mundo interior. Seus maiores benefícios não estão em \"ver coisas\", mas sim na clareza profunda que ela proporciona após o trabalho.\n- Reprocessamento Emocional: Ajuda a acessar e ressignificar memórias, crenças limitantes e emoções estagnadas, permitindo que você olhe para a própria vida a partir de uma nova perspectiva, com mais compaixão e menos julgamento.\n- Liberação Somática: Muitas vezes o corpo guarda tensões e traumas que a mente já esqueceu. A medicina promove uma varredura física, auxiliando o corpo a liberar essas tensões (seja através de tremores, bocejos, choro ou purgas), trazendo uma sensação de extrema leveza e renovação física nos dias seguintes.\n- Clareza de Propósito: Ao silenciar as vozes externas e as pressões do dia a dia, a medicina afina a sua intuição, ajudando a organizar pensamentos confusos e a tomar decisões mais alinhadas com a sua verdadeira essência.\nA Ayahuasca é uma medicina ancestral utilizada por povos indígenas da Amazônia há séculos.\n\nÉ preparada a partir de duas plantas e utilizada em rituais sagrados como ferramenta de autoconhecimento, cura e conexão.\nNo Instituto Libélula, a consagramos com respeito, intenção e cuidado. Cada vivência é única — e é exatamente por isso que não dizemos o que você vai sentir. A jornada é sua.\n"},{"q":"O que eu preciso levar?","a":"Para garantir seu conforto durante toda a noite:\n\n• Colchonete, travesseiro e cobertor BEM quente (a chácara esfria à noite)\n• Agasalho e meias grossas\n• Roupas confortáveis, preferencialmente claras (calças largas, saias longas — nada que aperte a cintura)\n• Garrafa d'água\n• Repelente\n• Caderno e caneta (opcional — para anotar insights)\n• Itens para o altar (opcional — cristais, fotos de ancestrais, objetos de poder)"},{"q":"O que são os preceitos / dieta?","a":"A medicina começa a agir muito antes da consagração.\nNos 3 dias que antecedem o ritual:\n\n• Alimentação limpa — sem carnes (especialmente vermelha e porco), frituras, açúcar e ultraprocessados\n• Zero álcool e drogas — estritamente necessário\n• Resguardo sexual — direcionar a vitalidade para o processo de cura\n• Jejum de informação — evitar notícias pesadas, filmes violentos, conflitos\n\nNo dia do ritual:\n• Refeições leves (frutas, saladas, sopas ralas)\n• Jejum de sólidos entre 14h e 15h (impreterivelmente)\n• Manter-se hidratado com água ou chás naturais\n\n⚠️ Mandar avisos no grupo com 1 semana de antecedencia - 3x na semana\n"},{"q":"O que é Rapé e Sananga?","a":"- A Medicina do Rapé: Aterramento e Silêncio Mental\n\nO Rapé é a medicina da presença absoluta. Ele atua como um ancoradouro seguro quando a mente tenta fugir para o passado ou para o futuro.\n- Aterramento Imediato: O principal benefício do Rapé é trazer a sua energia vital diretamente para o corpo e para o chão (aterramento). Ele corta padrões de pensamentos repetitivos e acelerados, essenciais para o controle da ansiedade.\n- Foco e Centramento: Ao limpar o campo mental, ele gera um estado de alerta relaxado. Você se sente desperto, focado no momento presente e totalmente consciente do seu corpo e da sua respiração.\n- Desobstrução: Fisicamente, atua na limpeza das vias respiratórias e no alívio de tensões acumuladas na região da cabeça, pescoço e ombros, facilitando uma respiração mais profunda e fluida.\n\n\nA Medicina da Sananga: Limpeza e Resiliência\nA Sananga é a medicina do \"fogo frio\". O benefício dela está exatamente em ensinar o corpo a relaxar diante do desconforto.\n- Reset do Sistema Nervoso: O ardor intenso dos primeiros minutos atua como um \"choque\" de presença. Quando o pico passa, o sistema nervoso parassimpático é ativado, gerando um relaxamento muscular profundo, quase como se o corpo inteiro \"suspirasse\".\n- Desbloqueio Emocional: Os olhos são janelas emocionais. O estímulo da Sananga frequentemente ajuda a liberar lágrimas contidas e tristezas não processadas, lavando a alma e trazendo uma sensação de alívio imediato.\n- Clareza Visual e Mental: Além de benefícios tradicionais para a saúde ocular (prevenção e alívio de cansaço visual), ela promove o que chamamos de \"visão clara\", dissolvendo a confusão mental e melhorando o foco interno.\n\n• Rapé e Sananga são medicinas de poder tradicionais dos povos indígenas.\nAmbas são oferecidas durante a vivência como parte da cerimônia.\n"},{"q":"Qual o valor e como funciona o pagamento?","a":"Valor de Troca:\n\n• Antecipado (até 1 dia antes do ritual): R$ 180,00 no Pix | R$ 204,45 no cartão em até 3x\n• No dia da vivência: R$ 210,00 no Pix | R$ 238,53 no cartão em até 3x\n\nChave Pix: institut8libelula@gmail.com\nInclui: consagração, sopinha reconfortante na madrugada e dormir no espaço.\n\nAs vagas são limitadas para mantermos o acolhimento e a intimidade do nosso ninho 🦋"},{"q":"Posso cancelar? Como funciona o reembolso?","a":"Política de Cancelamento:\n\n• Até 7 dias antes do ritual: 100% reembolso (descontando taxas de cartão, se aplicável)\n• De 6 a 3 dias antes: 50% reembolso ou 100% como crédito para a próxima vivência\n• Menos de 48h ou ausência no dia: sem reembolso e sem crédito\n\n⚠️ ESSA POLÍTICA AINDA PRECISA SER CONFIRMADA PELO THIAGO."},{"q":"Onde fica e como chegar?","a":"📍 Chácara Aurora Austral\nPiedade/SP\nComo chegar na chácara\n\nEscreva Chácara Aurora Austral no Waze ou sistema de navegação de sua preferência.\nAdicionar como ponto ou rota de parada o Bar do Miro para você chegar aqui pela melhor opção de estrada.\n\nGoogle:\nhttps://maps.app.goo.gl/VYiBzFcBqaNxE9Am9?g_st=ipc\n\nWaze:\nUse o Waze para dirigir até Chácara Aurora Austral, SP: https://waze.com/ul/h6gy2c973x\n\nPs.: Não tem sinal de celular nas redondezas. \nVou deixar aqui a senha da rede Wi-Fi do Bar do Miro.\nNome da Rede: Bardomiro_clientes\nSenha: bardomiro\nHorário: 18h (sábado)\n"}]},{"type":"section","title":"Após tirar as dúvidas","content":["Verificar se a pessoa quer participar","Se sim → Passo 4 (Anamnese)","Se ainda em dúvida → dar espaço, não pressionar"]}]},{"id":4,"title":"Anamnese","timing":"Pessoa confirmou interesse em participar","icon":"📋","sections":[{"type":"trigger","text":"Participante quer participar e tirou as dúvidas"},{"type":"message","label":"Guardião envia","text":"[NOME], que alegria ter você com a gente! 🌿\n\nAntes de tudo, preciso que você preencha uma fichinha pra gente — é a nossa anamnese.\n\nEla é super importante pra garantirmos que sua experiência seja segura e acolhida.\n\n👉 Link: https://forms.gle/G1FQhZ51DfF63MFJ7\n\nPode preencher com calma, tá? assim que enviar, eu te mando as informações de pagamento e te coloco na lista 🦋"},{"type":"section","title":"Aguardar","content":["Participante preenche o formulário","Confirmar recebimento","Avançar para Passo 5 (Pagamento)"]},{"type":"note","variant":"info","text":"Se a pessoa demorar para preencher, enviar lembrete gentil em 24-48h. Nunca pressionar — o processo respeita o tempo dela."}]},{"id":5,"title":"Pagamento + Lista do Ritual","timing":"Anamnese preenchida","icon":"💰","sections":[{"type":"trigger","text":"Participante preencheu a anamnese"},{"type":"message","label":"Guardião envia","text":"Recebemos sua anamnese, [NOME]! Tudo certo por aqui ✅\n\nAgora vamos garantir sua vaga.\n\n💎 Valor de Troca:\n• Antecipado (até [DATA LIMITE]): R$ 180,00 no Pix | R$ 204,45 no cartão (até 3x)\n• No dia da vivência: R$ 210,00 no Pix | R$ 238,53 no cartão (até 3x)\n\n🔑 Chave Pix: institut8libelula@gmail.com\n\nInclui: consagração, sopinha reconfortante na madrugada e dormir no espaço.\n\nAssim que o pagamento for confirmado, você entra oficialmente na lista! As vagas são limitadas (30) pra manter o acolhimento do ninho 🦋\n\nPode mandar o comprovante aqui mesmo."},{"type":"section","title":"Após receber comprovante","content":["Confirmar o pagamento","Adicionar nome na lista do ritual (ordem alfabética)","Enviar mensagem de confirmação"]},{"type":"message","label":"Confirmação — Guardião envia","text":"Pagamento confirmado, [NOME]! 🎉\n\nVocê tá oficialmente na lista do ritual [NOME DA VIVÊNCIA] — [DATA].\n\nVou te mandar as instruções de preparação em breve. Fique de olho aqui 🙏\n\nSe tiver qualquer dúvida até lá, é só chamar."},{"type":"note","variant":"warn","text":"LEMBRETE AUTOMÁTICO: Se a pessoa não pagou e a data do valor antecipado está chegando (D-1), enviar lembrete gentil.\n\n⚠️ PROCESSO DE COBRANÇA AINDA SERÁ AUTOMATIZADO (Fase PRÓXIMO do roadmap)."},{"type":"section","title":"Política de Cancelamento (para consultar se necessário)","content":["Até 7 dias antes: 100% reembolso","6 a 3 dias antes: 50% ou crédito para próxima vivência","Menos de 48h / ausência: sem reembolso","⚠️ Aguardando confirmação do Thiago"]}]},{"id":6,"title":"Guia de Preparação","timing":"3 dias antes do ritual (D-3)","icon":"🌿","sections":[{"type":"trigger","text":"3 dias antes do ritual — enviar guia de preparação"},{"type":"message","label":"Guardião envia (D-3)","text":"Fala, [NOME]! Tá chegando o dia 🌿\n\nDaqui a 3 dias a gente se encontra. Preparei um guia de preparação pra você chegar da melhor forma pra essa vivência.\n\n🌱 PRECEITOS (3 dias antes):\n\n• Alimentação limpa — sem carnes, frituras, excesso de açúcar e ultraprocessados\n• Zero álcool e drogas\n• Resguardo sexual\n• Jejum de informação — evite notícias pesadas e conflitos\n\n📅 NO DIA DO RITUAL:\n\n• Refeições leves (frutas, saladas, sopas)\n• Jejum de sólidos a partir das 14h-15h\n• Manter-se hidratado com água ou chás\n\n🎒 O QUE LEVAR:\n\n• Colchonete, travesseiro e cobertor BEM quente\n• Agasalho e meias grossas\n• Roupas confortáveis e claras\n• Garrafa d'água\n• Repelente\n• Caderno e caneta (opcional)\n• Itens para o altar (opcional — cristais, fotos de ancestrais)\n\nSe tiver qualquer dúvida, é só chamar. Te vejo em breve! 🙏🦋"},{"type":"section","title":"Lembrete D-1 (opcional)","content":["Enviar lembrete breve no dia anterior","Confirmar se a pessoa está bem e com transporte resolvido","Mandar avisos no grupo com 1 semana de antecedencia - 3x na semana ⚠️ "]}]},{"id":7,"title":"Dia do Ritual","timing":"Sábado, 18h","icon":"🔥","sections":[{"type":"trigger","text":"Dia do ritual — confirmar presença e dar últimas orientações"},{"type":"message","label":"Guardião envia (dia do ritual, manhã)","text":"Hoje é o dia, [NOME]! 🔥\n\nLembrando:\n• Jejum de sólidos a partir das 14h\n• Hidratar bem com água ou chás\n• Chegar a partir das [HORÁRIO]\n• Local: Chácara Aurora Austral — Piedade/SP\n\nSe precisar de ajuda com o endereço ou transporte, me avisa.\n\nTe espero lá. Vai ser lindo 🙏🦋"},{"type":"note","variant":"info","text":"Local: Chácara Aurora Austral — Piedade/SP\nHorário: 18h\n\n⚠️ ENDEREÇO COMPLETO / REFERÊNCIAS / MAPA — FALTA PEDIR AO THIAGO."},{"type":"section","title":"Durante o ritual","content":["Thiago e guardiões presentes","Ayahuasca + Soundhealing + Rapé + Sananga","Sopinha reconfortante na madrugada","Partilha consciente pela manhã","Pessoas podem dormir no espaço","Horário de chegada é a partir das 16h e saída até as 12h do dia seguinte"]}]},{"id":8,"title":"Pós-Vivência","timing":"D+1 (dia seguinte ao ritual)","icon":"🌱","sections":[{"type":"trigger","text":"Dia seguinte ao ritual — enviar guia de integração + feedback"},{"type":"message","label":"Guardião envia (D+1)","text":"Bom dia, [NOME]! Como você está se sentindo? 🌿\n\nA cerimônia terminou, a música parou, mas o processo continua.\n\nDizem que a Ayahuasca abre a porta, mas é você quem deve caminhar através dela nos dias seguintes. A cerimônia é 50% do trabalho; os outros 50% são como você traz o que viu lá dentro para o dia a dia aqui fora.\n\n🌱 OS 3 DIAS DE OURO (Resguardo):\n\nNas próximas 72 horas, você ainda está energeticamente aberto:\n• Alimentação leve — frutas, legumes, caldos, raízes\n• Zero álcool e drogas (inegociável)\n• Abstinência sexual (3 dias)\n\n🧠 CUIDADO MENTAL:\n• Evite ruídos, aglomerações e noticiários\n• Tenha um caderno por perto para anotar insights e sonhos\n• Não tente explicar o inexplicável — guarde a energia pra você\n\n🌍 GROUNDING:\n• Pise descalço na grama ou terra\n• Tome banhos de ervas (Alecrim, Manjericão, Arruda)\n• Beba muita água\n\n⚠️ Se sentir angústia excessiva ou pensamentos confusos, não hesite em me chamar.\n\nA medicina te mostrou o caminho. Agora, dê o primeiro passo 🙏\n\nCom carinho,\nTxi Ruas | Terapeuta Integrativo"},{"type":"message","label":"Feedback + Grupos (enviar junto ou D+2)","text":"E [NOME], queria te pedir um favorzinho 🙏\n\n👉 Nosso formulário de feedback: https://forms.gle/8dRAgiW6iutK8RmX8\n\nÉ rapidinho e nos ajuda muito a preparar um ninho cada vez melhor pra todo mundo.\n\nE se quiser continuar conectado(a) com a comunidade:\n\n📱 Grupos do Instituto:\n• Comunidade: https://chat.whatsapp.com/Gj2zfOnYLNM2oyrvEzvWCI\n• Acompanhamento Astrológico: https://chat.whatsapp.com/LVNliIDq33C0tEAvtItQy5\n• Núcleo Aurora: https://chat.whatsapp.com/KBN7cmxR0fU5wCg0qOGTCF\n\nA gente se vê na próxima! 🦋"},{"type":"note","variant":"info","text":"Astróloga parceira: Cynthia Aurea — disponível para acompanhamento astrológico e suporte terapêutico."},{"type":"note","variant":"warn","text":"⚠️ VERIFICAR COM THIAGO: Ele tem costume de mandar mensagem de pós-integração? Confirmar formato e timing."}]}];
+// ============================================================
+// JSONBIN CONFIG
+// 1. Crie conta em https://jsonbin.io
+// 2. Crie um bin com qualquer JSON (ex: {"steps":[]})
+// 3. Copie o Bin ID e o Master Key
+// 4. Cole abaixo:
+// ============================================================
+const JSONBIN_API_URL = 'https://api.jsonbin.io/v3';
+const JSONBIN_BIN_ID = '69dfa5bcaaba882197013625';
+const JSONBIN_MASTER_KEY = '$2a$10$6ljDY4dX2nyvcyf35JpqKOGZaTX9NNhLS4uGMweL56OIMPfeiRfhu';
+
+let steps = JSON.parse(JSON.stringify(ORIGINAL_STEPS));
+let currentStep = 0;
+let saveTimeout = null;
+
+async function loadData() {
+  if (!JSONBIN_BIN_ID) return; // fallback to ORIGINAL_STEPS already loaded
+  try {
+    setSaveIndicator('saving');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    const res = await fetch(`${JSONBIN_API_URL}/b/${JSONBIN_BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': JSONBIN_MASTER_KEY },
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const loadedSteps = data.record.steps;
+    if (Array.isArray(loadedSteps) && loadedSteps.length > 0) {
+      steps = loadedSteps;
+      renderAll();
+      setSaveIndicator('saved');
+    } else {
+      // Bin is empty — push original data
+      await saveData();
+      setSaveIndicator('saved');
+    }
+  } catch(e) {
+    console.warn('Failed to load from JSONBin:', e);
+    setSaveIndicator('unsaved');
+  }
+}
+
+async function saveData() {
+  if (!JSONBIN_BIN_ID) {
+    setSaveIndicator('unsaved');
+    return;
+  }
+  try {
+    setSaveIndicator('saving');
+    const res = await fetch(`${JSONBIN_API_URL}/b/${JSONBIN_BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'X-Master-Key': JSONBIN_MASTER_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ steps, lastSaved: Date.now() })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    setSaveIndicator('saved');
+  } catch(e) {
+    console.warn('Failed to save to JSONBin:', e);
+    setSaveIndicator('unsaved');
+  }
+}
+
+function scheduleSave() {
+  setSaveIndicator('saving');
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => saveData(), 800);
+}
+
+function resetData() {
+  if (!confirm('Resetar todo o conteudo para o original? Edicoes serao perdidas.')) return;
+  steps = JSON.parse(JSON.stringify(ORIGINAL_STEPS));
+  currentStep = 0;
+  renderAll();
+  scheduleSave();
+}
+
+function showSetupBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'setupBanner';
+  banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2a2210;border:1px solid #4a3a10;color:#fb923c;padding:14px 24px;border-radius:12px;font-size:13px;z-index:999;max-width:520px;text-align:center;line-height:1.7;box-shadow:0 10px 40px rgba(0,0,0,0.5);';
+  banner.innerHTML = `
+    <strong>JSONBin nao configurado</strong><br>
+    As edicoes estao sendo salvas apenas no navegador.<br>
+    Para salvar na nuvem, edite o arquivo HTML e preencha<br>
+    <code style="background:#1a1d27;padding:2px 6px;border-radius:4px;">JSONBIN_BIN_ID</code> e
+    <code style="background:#1a1d27;padding:2px 6px;border-radius:4px;">JSONBIN_MASTER_KEY</code><br>
+    <a href="https://jsonbin.io" target="_blank" style="color:#7c6ef0;text-decoration:underline;">Criar conta no JSONBin.io</a>
+    <button onclick="document.getElementById('setupBanner').remove()" style="display:block;margin:10px auto 0;background:transparent;border:1px solid #4a3a10;color:#fb923c;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;">Entendi</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+const sidebar = document.getElementById('sidebar');
+const main = document.getElementById('main');
+
+function renderAll() {
+  renderSidebar();
+  renderStep(currentStep);
+}
+function renderSidebar() {
+  sidebar.innerHTML = steps.map((s, i) => {
+    return `
+      <div class="step-item ${i === currentStep ? 'active' : ''}" data-step="${i}" onclick="goToStep(${i})">
+        <div class="step-num">${s.id}</div>
+        <div class="step-info">
+          <h3>${s.icon} ${s.title}</h3>
+          <span>${s.timing}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+function goToStep(index) {
+  currentStep = Math.max(0, Math.min(index, steps.length - 1));
+  document.querySelectorAll('.step-item').forEach((el, i) => {
+    el.classList.toggle('active', i === currentStep);
+  });
+  renderStep(currentStep);
+  main.scrollTop = 0;
+}
+function renderStep(index) {
+  const step = steps[index];
+  if (!step) { main.innerHTML = '<p style="color:var(--text2)">Nenhum passo.</p>'; return; }
+  let html = `
+    <div class="step-title-row">
+      <div class="step-title">${step.icon} ${step.title}</div>
+      <button class="delete-step-btn" onclick="deleteStep(${index})">Remover passo</button>
+    </div>
+    <div class="step-timing">⏱ ${step.timing}</div>`;
+
+  for (let si = 0; si < step.sections.length; si++) {
+    const sec = step.sections[si];
+    html += renderSection(index, si, sec);
+  }
+
+  // Add section button
+  html += `
+    <div id="sectionPicker-${index}"></div>
+    <button class="add-section-btn" onclick="showSectionTypePicker(${index})">+ Adicionar seção</button>`;
+
+  // Navigation
+  html += `<div style="display:flex;gap:12px;margin-top:24px;">`;
+  if (index > 0) html += `<button onclick="goToStep(${index - 1})" style="padding:10px 20px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;font-size:14px;">← Passo ${index}</button>`;
+  if (index < steps.length - 1) html += `<button onclick="goToStep(${index + 1})" style="padding:10px 20px;background:var(--accent);border:none;color:#fff;border-radius:8px;cursor:pointer;font-size:14px;">Passo ${index + 2} →</button>`;
+  html += `</div>`;
+
+  main.innerHTML = html;
+}
+function renderSection(stepIdx, secIdx, sec) {
+  if (sec.type === 'trigger') {
+    return `
+      <div class="trigger section-editable" contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="text" onblur="syncEdit(this) onfocus="this.dataset.before=this.innerText">⚡ Gatilho: ${sec.text}</div>`;
+  }
+  if (sec.type === 'note') {
+    const cls = sec.variant === 'warn' ? 'note-warn' : sec.variant === 'green' ? 'note-green' : 'note-info';
+    return `
+      <div class="section">
+        <div class="section-header">
+          <button class="section-delete-btn" onclick="deleteSection(${stepIdx},${secIdx})">Remover</button>
+        </div>
+        <div class="note ${cls} section-editable" contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="text" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">📌 ${sec.text}</div>
+      </div>`;
+  }
+  if (sec.type === 'section') {
+    return `
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title section-editable" contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="title" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">${sec.title}</div>
+          <button class="section-delete-btn" onclick="deleteSection(${stepIdx},${secIdx})">Remover</button>
+        </div>
+        <ul class="action-list">
+          ${sec.content.map((c, ci) => `
+            <li>
+              <span contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="content" data-item="${ci}" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">${c}</span>
+              <button class="remove-item-btn" onclick="removeListItem(${stepIdx},${secIdx},${ci})">✕</button>
+            </li>`).join('')}
+        </ul>
+        <button class="add-item-btn" onclick="addListItem(${stepIdx},${secIdx})">+ item</button>
+      </div>`;
+  }
+  if (sec.type === 'message') {
+    return `
+      <div class="section">
+        <div class="section-header">
+          <div class="msg-label section-editable" contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="label" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">${sec.label}</div>
+          <button class="section-delete-btn" onclick="deleteSection(${stepIdx},${secIdx})">Remover</button>
+        </div>
+        <div class="msg-box">
+          <button class="copy-btn" onclick="copyMsg(this)">Copiar</button>
+          <p class="section-editable" contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="text" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">${sec.text}</p>
+        </div>
+      </div>`;
+  }
+  if (sec.type === 'faq') {
+    return `
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">FAQ</div>
+          <button class="section-delete-btn" onclick="deleteSection(${stepIdx},${secIdx})">Remover</button>
+        </div>
+        ${sec.items.map((item, fi) => `
+          <div class="faq-item" id="faq-${stepIdx}-${secIdx}-${fi}">
+            <div class="faq-question" onclick="toggleFaq('faq-${stepIdx}-${secIdx}-${fi}')">
+              <span contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="faq-q" data-item="${fi}" onblur="syncEdit(this)" onclick="event.stopPropagation()" onfocus="this.dataset.before=this.innerText">${item.q}</span>
+              <span class="faq-arrow">▶</span>
+            </div>
+            <div class="faq-answer">
+              <p contenteditable="true" data-step="${stepIdx}" data-sec="${secIdx}" data-field="faq-a" data-item="${fi}" onblur="syncEdit(this)" onfocus="this.dataset.before=this.innerText">${item.a}</p>
+              <button class="copy-btn-float" onclick="copyFaq(this)">Copiar resposta</button>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+  return '';
+}
+function syncEdit(el) {
+  // Don't save if content didn't change
+  if (el.dataset.before !== undefined && el.innerText === el.dataset.before) return;
+
+  const si = parseInt(el.dataset.step);
+  const sec = parseInt(el.dataset.sec);
+  const field = el.dataset.field;
+  const itemIdx = el.dataset.item !== undefined ? parseInt(el.dataset.item) : null;
+
+  const section = steps[si].sections[sec];
+
+  if (field === 'text') {
+    // For trigger, strip the "⚡ Gatilho: " prefix if present
+    let val = el.innerText;
+    if (section.type === 'trigger') val = val.replace(/^⚡\s*Gatilho:\s*/, '');
+    else if (section.type === 'note') val = val.replace(/^📌\s*/, '');
+    section.text = val;
+  } else if (field === 'title' || field === 'label') {
+    section[field] = el.innerText;
+  } else if (field === 'content' && itemIdx !== null) {
+    section.content[itemIdx] = el.innerText;
+  } else if (field === 'faq-q' && itemIdx !== null) {
+    section.items[itemIdx].q = el.innerText;
+  } else if (field === 'faq-a' && itemIdx !== null) {
+    section.items[itemIdx].a = el.innerText;
+  }
+
+  scheduleSave();
+}
+function deleteSection(stepIdx, secIdx) {
+  if (!confirm('Remover esta seção?')) return;
+  steps[stepIdx].sections.splice(secIdx, 1);
+  scheduleSave();
+  renderStep(currentStep);
+}
+function showSectionTypePicker(stepIdx) {
+  const container = document.getElementById(`sectionPicker-${stepIdx}`);
+  const types = [
+    { type: 'message', label: '💬 Mensagem' },
+    { type: 'section', label: '📋 Lista' },
+    { type: 'note', label: '📌 Nota' },
+    { type: 'trigger', label: '⚡ Gatilho' },
+    { type: 'faq', label: '❓ FAQ' }
+  ];
+  container.innerHTML = `
+    <div class="section-type-picker">
+      <span>Tipo:</span>
+      ${types.map(t => `<button class="type-opt" onclick="addSection(${stepIdx},'${t.type}')">${t.label}</button>`).join('')}
+      <button class="type-opt-cancel" onclick="document.getElementById('sectionPicker-${stepIdx}').innerHTML=''">Cancelar</button>
+    </div>`;
+}
+function addSection(stepIdx, type) {
+  const templates = {
+    message: { type: 'message', label: 'Nova mensagem', text: 'Texto da mensagem...' },
+    section: { type: 'section', title: 'Nova seção', content: ['Item 1'] },
+    note: { type: 'note', variant: 'info', text: 'Texto da nota...' },
+    trigger: { type: 'trigger', text: 'Novo gatilho...' },
+    faq: { type: 'faq', items: [{ q: 'Nova pergunta?', a: 'Resposta...' }] }
+  };
+  steps[stepIdx].sections.push(templates[type]);
+  scheduleSave();
+  renderStep(currentStep);
+}
+function addListItem(stepIdx, secIdx) {
+  steps[stepIdx].sections[secIdx].content.push('Novo item');
+  scheduleSave();
+  renderStep(currentStep);
+}
+function removeListItem(stepIdx, secIdx, itemIdx) {
+  steps[stepIdx].sections[secIdx].content.splice(itemIdx, 1);
+  scheduleSave();
+  renderStep(currentStep);
+}
+function openNewStepModal() {
+  const icons = ['👋','✅','❓','📋','💰','🌿','🔥','🌱','🎯','💫','🌙','⚡','🎪','🙏','🦋','💎','🔔','📝'];
+  document.getElementById('modalContent').innerHTML = `
+    <h2>Novo Passo</h2>
+    <label>Título</label>
+    <input id="newStepTitle" placeholder="Ex: Preparação energética" autofocus>
+    <label>Momento</label>
+    <input id="newStepTiming" placeholder="Ex: 2 dias antes do ritual">
+    <label>Ícone</label>
+    <div class="icon-grid" id="iconGrid">
+      ${icons.map(ic => `<div class="icon-opt" onclick="selectIcon(this,'${ic}')">${ic}</div>`).join('')}
+    </div>
+    <input type="hidden" id="newStepIcon" value="🎯">
+    <div class="modal-actions">
+      <button class="hdr-btn" onclick="closeModal()">Cancelar</button>
+      <button class="hdr-btn primary" onclick="createStep()">Criar</button>
+    </div>`;
+  document.getElementById('modalOverlay').style.display = 'flex';
+  // Auto-select first icon
+  document.querySelector('.icon-opt').classList.add('selected');
+}
+function selectIcon(el, icon) {
+  document.querySelectorAll('.icon-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('newStepIcon').value = icon;
+}
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+function createStep() {
+  const title = document.getElementById('newStepTitle').value.trim();
+  const timing = document.getElementById('newStepTiming').value.trim();
+  const icon = document.getElementById('newStepIcon').value;
+  if (!title) { alert('Informe um título.'); return; }
+  steps.push({
+    id: steps.length + 1,
+    title,
+    timing: timing || 'A definir',
+    icon,
+    sections: [{ type: 'trigger', text: 'Gatilho a definir' }]
+  });
+  closeModal();
+  scheduleSave();
+  currentStep = steps.length - 1;
+  renderAll();
+}
+function deleteStep(stepIdx) {
+  if (!confirm(`Remover o passo "${steps[stepIdx].title}"?`)) return;
+  steps.splice(stepIdx, 1);
+  steps.forEach((s, i) => s.id = i + 1);
+  if (currentStep >= steps.length) currentStep = steps.length - 1;
+  scheduleSave();
+  renderAll();
+}
+function toggleFaq(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+function copyMsg(btn) {
+  const p = btn.parentElement.querySelector('p');
+  navigator.clipboard.writeText(p.innerText).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+function copyFaq(btn) {
+  const p = btn.parentElement.querySelector('p');
+  navigator.clipboard.writeText(p.innerText).then(() => {
+    btn.textContent = 'Copiado!';
+    setTimeout(() => { btn.textContent = 'Copiar resposta'; }, 2000);
+  });
+}
+function setSaveIndicator(state) {
+  const el = document.getElementById('saveStatus');
+  if (state === 'saving') {
+    el.className = 'save-status saving';
+  } else if (state === 'saved') {
+    el.className = 'save-status saved';
+  } else {
+    el.className = 'save-status unsaved';
+  }
+}
+
+async function manualSave() {
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+  try {
+    await saveData();
+    btn.textContent = 'Salvo!';
+    setTimeout(() => { btn.textContent = originalText; }, 1500);
+  } catch(e) {
+    btn.textContent = 'Erro ao salvar';
+    setTimeout(() => { btn.textContent = originalText; }, 2000);
+  }
+  btn.disabled = false;
+}
+
+function exportHTML() {
+  const dataStr = JSON.stringify(steps).replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/<\/script/gi, '<\\/script');
+  const styles = document.querySelector('style').textContent;
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pergaminho do Guardiao — Instituto Libelula</title>
+<style>${styles}</style>
+</head>
+<body>
+${document.querySelector('.header').outerHTML}
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-steps" id="sidebar"></div>
+    <div class="sidebar-add">
+      <button class="add-step-btn" onclick="openNewStepModal()">+ Novo Passo</button>
+    </div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+<script>
+const ORIGINAL_STEPS = ${dataStr};
+const JSONBIN_API_URL = '${JSONBIN_API_URL}';
+const JSONBIN_BIN_ID = '${JSONBIN_BIN_ID}';
+const JSONBIN_MASTER_KEY = '${JSONBIN_MASTER_KEY}';
+let steps = JSON.parse(JSON.stringify(ORIGINAL_STEPS));
+let currentStep = 0;
+let saveTimeout = null;
+const sidebar = document.getElementById('sidebar');
+const main = document.getElementById('main');
+${loadData.toString()}
+${saveData.toString()}
+${scheduleSave.toString()}
+${resetData.toString()}
+${showSetupBanner.toString()}
+${renderAll.toString()}
+${renderSidebar.toString()}
+${goToStep.toString()}
+${renderStep.toString()}
+${renderSection.toString()}
+${syncEdit.toString()}
+${deleteSection.toString()}
+${showSectionTypePicker.toString()}
+${addSection.toString()}
+${addListItem.toString()}
+${removeListItem.toString()}
+${openNewStepModal.toString()}
+${selectIcon.toString()}
+${closeModal.toString()}
+${createStep.toString()}
+${deleteStep.toString()}
+${toggleFaq.toString()}
+${copyMsg.toString()}
+${copyFaq.toString()}
+${setSaveIndicator.toString()}
+(async () => { await loadData(); renderAll(); if (!JSONBIN_BIN_ID) showSetupBanner(); })();
+<\/script>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Pergaminho_do_Guardiao_v2.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Render immediately, then load from JSONBin in background
+renderAll();
+loadData();
+if (!JSONBIN_BIN_ID) showSetupBanner();
+</script>
+</body>
+</html>
