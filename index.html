@@ -715,7 +715,57 @@
 <div class="gate-overlay" id="gateOverlay">
   <div class="gate-particles" id="gateParticles"></div>
   <div class="gate-content" id="gateContent">
-    <div class="gate-icon">🦋</div>
+    <div class="gate-icon">
+      <svg viewBox="0 0 200 200" width="80" height="80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <ellipse cx="100" cy="100" rx="4" ry="38" fill="url(#bodyGrad)"/>
+        <!-- Head -->
+        <circle cx="100" cy="60" r="5" fill="#a78bfa"/>
+        <circle cx="97" cy="57" r="1.5" fill="#c4b5fd"/>
+        <circle cx="103" cy="57" r="1.5" fill="#c4b5fd"/>
+        <!-- Antennae -->
+        <path d="M97 55 Q88 40 82 35" stroke="#a78bfa" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M103 55 Q112 40 118 35" stroke="#a78bfa" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <circle cx="82" cy="35" r="2" fill="#c4b5fd" opacity="0.7"/>
+        <circle cx="118" cy="35" r="2" fill="#c4b5fd" opacity="0.7"/>
+        <!-- Left Wings - Upper -->
+        <path d="M96 80 Q60 50 30 55 Q15 58 20 75 Q28 95 70 88 Z" fill="url(#wingGradL)" opacity="0.6" stroke="#7c6ef0" stroke-width="0.5"/>
+        <!-- Left Wings - Lower -->
+        <path d="M96 92 Q55 80 28 90 Q15 95 25 108 Q40 120 75 100 Z" fill="url(#wingGradL)" opacity="0.5" stroke="#7c6ef0" stroke-width="0.5"/>
+        <!-- Right Wings - Upper -->
+        <path d="M104 80 Q140 50 170 55 Q185 58 180 75 Q172 95 130 88 Z" fill="url(#wingGradR)" opacity="0.6" stroke="#7c6ef0" stroke-width="0.5"/>
+        <!-- Right Wings - Lower -->
+        <path d="M104 92 Q145 80 172 90 Q185 95 175 108 Q160 120 125 100 Z" fill="url(#wingGradR)" opacity="0.5" stroke="#7c6ef0" stroke-width="0.5"/>
+        <!-- Wing veins left upper -->
+        <path d="M96 80 Q70 65 40 62" stroke="#9b8ce8" stroke-width="0.4" fill="none" opacity="0.5"/>
+        <path d="M96 82 Q75 72 45 70" stroke="#9b8ce8" stroke-width="0.4" fill="none" opacity="0.4"/>
+        <!-- Wing veins right upper -->
+        <path d="M104 80 Q130 65 160 62" stroke="#9b8ce8" stroke-width="0.4" fill="none" opacity="0.5"/>
+        <path d="M104 82 Q125 72 155 70" stroke="#9b8ce8" stroke-width="0.4" fill="none" opacity="0.4"/>
+        <!-- Tail segments -->
+        <ellipse cx="100" cy="120" rx="3.5" ry="4" fill="#8b7ce0" opacity="0.7"/>
+        <ellipse cx="100" cy="128" rx="3" ry="3.5" fill="#7c6ef0" opacity="0.6"/>
+        <ellipse cx="100" cy="135" rx="2.5" ry="3" fill="#6d5fd4" opacity="0.5"/>
+        <!-- Tail end -->
+        <path d="M98 137 L100 145 L102 137" fill="#5b4cc4" opacity="0.4"/>
+        <!-- Gradients -->
+        <defs>
+          <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#a78bfa"/>
+            <stop offset="50%" stop-color="#7c6ef0"/>
+            <stop offset="100%" stop-color="#5b4cc4"/>
+          </linearGradient>
+          <linearGradient id="wingGradL" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#c4b5fd"/>
+            <stop offset="100%" stop-color="#7c6ef0" stop-opacity="0.2"/>
+          </linearGradient>
+          <linearGradient id="wingGradR" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#c4b5fd"/>
+            <stop offset="100%" stop-color="#7c6ef0" stop-opacity="0.2"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
     <div class="gate-title">Instituto Libélula</div>
     <div class="gate-subtitle">Pergaminho do Guardião</div>
     <div class="gate-input-wrap">
