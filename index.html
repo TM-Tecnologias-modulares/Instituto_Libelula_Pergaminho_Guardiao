@@ -888,6 +888,7 @@
   <div class="gate-welcome" id="gateWelcome">
     <div class="gate-welcome-icon">🌿</div>
     <div class="gate-welcome-text">Seja a mudança que você deseja ver<br>na sua própria caminhada</div>
+    <div id="gateModeLabel" style="margin-top:16px;font-size:13px;opacity:0.5;font-family:'Manrope',sans-serif;"></div>
   </div>
 </div>
 
@@ -1318,6 +1319,7 @@ const main = document.getElementById('main');
 function renderAll() {
   renderSidebar();
   renderStep(currentStep);
+  if (isReadOnly) applyReadOnlyMode();
 }
 function renderSidebar() {
   sidebar.innerHTML = steps.map((s, i) => {
@@ -1696,11 +1698,30 @@ ${setSaveIndicator.toString()}
 // ============================================================
 // GATE — Tela de senha
 // ============================================================
-const GATE_PASSWORD = 'Ldelibelula';
+const GATE_READONLY = 'Ldelibelula';
+const GATE_ADMIN = 'Ldelibelulaadmin';
+let isReadOnly = false;
+
+function applyReadOnlyMode() {
+  // Remove contenteditable from all elements
+  document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+    el.removeAttribute('contenteditable');
+  });
+  // Hide edit controls
+  document.querySelectorAll('.hdr-btn.save, .hdr-btn.primary, .add-section-btn, .add-step-btn, .delete-step-btn, .section-delete-btn, .remove-item-btn, .add-item-btn').forEach(el => {
+    el.style.display = 'none';
+  });
+  // Hide save status
+  const saveStatus = document.getElementById('saveStatus');
+  if (saveStatus) saveStatus.style.display = 'none';
+}
 
 function initGate() {
-  if (sessionStorage.getItem('gate_unlocked')) {
+  const mode = sessionStorage.getItem('gate_mode');
+  if (mode) {
     document.getElementById('gateOverlay').classList.add('hidden');
+    isReadOnly = (mode === 'readonly');
+    if (isReadOnly) applyReadOnlyMode();
     return;
   }
   // Generate particles (fewer on mobile)
@@ -1726,25 +1747,39 @@ function initGate() {
 function checkGate() {
   const input = document.getElementById('gateInput');
   const error = document.getElementById('gateError');
-  if (input.value === GATE_PASSWORD) {
+  const val = input.value;
+
+  if (val === GATE_ADMIN) {
     error.textContent = '';
-    sessionStorage.setItem('gate_unlocked', '1');
-    // Show welcome message
-    document.getElementById('gateContent').style.display = 'none';
-    const welcome = document.getElementById('gateWelcome');
-    welcome.classList.add('active');
-    // Dissolve after 3s
-    setTimeout(() => {
-      document.getElementById('gateOverlay').classList.add('dissolving');
-      setTimeout(() => {
-        document.getElementById('gateOverlay').classList.add('hidden');
-      }, 1500);
-    }, 3000);
+    isReadOnly = false;
+    sessionStorage.setItem('gate_mode', 'admin');
+    dissolveGate();
+  } else if (val === GATE_READONLY) {
+    error.textContent = '';
+    isReadOnly = true;
+    sessionStorage.setItem('gate_mode', 'readonly');
+    dissolveGate();
   } else {
     error.textContent = 'Senha incorreta';
     input.value = '';
     input.focus();
   }
+}
+
+function dissolveGate() {
+  document.getElementById('gateContent').style.display = 'none';
+  const welcome = document.getElementById('gateWelcome');
+  welcome.classList.add('active');
+  // Show mode label
+  const label = document.getElementById('gateModeLabel');
+  if (label) label.textContent = isReadOnly ? 'Modo leitura' : 'Modo administrador';
+  setTimeout(() => {
+    document.getElementById('gateOverlay').classList.add('dissolving');
+    setTimeout(() => {
+      document.getElementById('gateOverlay').classList.add('hidden');
+      if (isReadOnly) applyReadOnlyMode();
+    }, 1500);
+  }, 3000);
 }
 
 // ============================================================
