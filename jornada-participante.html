@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jornada do Participante — Instituto Libelula</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.5);
+            font-weight: 300;
+        }
+
+        .header .dragonfly {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 20px;
+            background: #111;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.green { background: #4a9e4a; }
+        .legend-dot.yellow { background: #e6a817; }
+        .legend-dot.red { background: #c0392b; }
+        .legend-dot.blue { background: #2980b9; }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px;
+            background: #0f0f0f;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .nav a:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .diagram-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .diagram-card {
+            background: #111;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 48px;
+            overflow: hidden;
+        }
+
+        .diagram-card-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .diagram-card-header .number {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .diagram-card-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .diagram-card-header p {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.4);
+            margin-left: auto;
+        }
+
+        .diagram-card-body {
+            padding: 32px;
+            overflow-x: auto;
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+            padding: 32px;
+        }
+
+        .inventory-col {
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .inventory-col h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inventory-col h3 .icon { font-size: 1.2rem; }
+
+        .inventory-item {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        .inventory-item:hover { background: rgba(255,255,255,0.03); }
+
+        .inventory-item .status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .inventory-item .status.green { background: #4a9e4a; }
+        .inventory-item .status.yellow { background: #e6a817; }
+        .inventory-item .status.red { background: #c0392b; }
+
+        .inventory-item .label { color: rgba(255,255,255,0.8); }
+        .inventory-item .detail { color: rgba(255,255,255,0.35); font-size: 0.8rem; margin-left: auto; }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.6rem; }
+            .legend { gap: 16px; }
+            .inventory-grid { grid-template-columns: 1fr; }
+            .diagram-card-header { flex-wrap: wrap; }
+            .diagram-card-header p { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="dragonfly">🪽</div>
+    <h1>Jornada do Participante</h1>
+    <div class="subtitle">Instituto Libelula — Chacara Aurora Austral</div>
+</div>
+
+<div class="legend">
+    <div class="legend-item">
+        <div class="legend-dot green"></div>
+        <span>Temos / Definido</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-dot yellow"></div>
+        <span>Pendente com Thiago</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-dot red"></div>
+        <span>Precisa criar</span>
+    </div>
+    <div class="legend-item">
+        <div class="legend-dot blue"></div>
+        <span>Gatilho temporal</span>
+    </div>
+</div>
+
+<div class="nav">
+    <a href="#mapa-mental">Mapa Mental</a>
+    <a href="#fluxo">Fluxo Sequencial</a>
+    <a href="#decisoes">Decisoes</a>
+    <a href="#timeline">Timeline</a>
+    <a href="#inventario">Inventario</a>
+</div>
+
+<div class="diagram-section">
+
+    <!-- MAPA MENTAL -->
+    <div class="diagram-card" id="mapa-mental">
+        <div class="diagram-card-header">
+            <div class="number">1</div>
+            <h2>Mapa Mental da Jornada</h2>
+            <p>Visao completa — clique para expandir</p>
+        </div>
+        <div class="diagram-card-body">
+            <pre class="mermaid">
+mindmap
+  root((Jornada do
+  Participante))
+    1. Primeiro Contato
+      Thiago da boas-vindas
+      Passa o contato
+      Modelo hibrido
+      Status: Definido
+    2. Boas-vindas Sistema
+      Mensagem acolhedora
+      Apresenta o Instituto
+      Status: Precisa criar
+      Tom: sem condicionamento
+    3. FAQ e Informacoes
+      O que e Soundhealing
+        Texto aprovado
+      O que levar no ritual
+        Texto aprovado
+      Preceitos e Dieta
+        Texto aprovado
+      Cerimonia com Tui
+        Texto aprovado
+      O que e Ayahuasca
+        Precisa de texto
+      Peia e Limpeza
+        Thiago decidindo
+      Formato: WhatsApp
+      Regra: Zero condicionamento
+    4. Anamnese
+      Google Forms existente
+        Link ativo
+      Mensagem pedindo preenchimento
+        Precisa criar
+      Lembrete se nao preencheu
+        Precisa criar
+    5. Confirmacao e Pagamento
+      Valores definidos
+        R$180 antecipado
+        R$210 no dia
+      Chave Pix
+        institut8libelula gmail
+      Confirmacao via comprovante
+        Definido
+      Lembrete D-1
+        Precisa criar
+      Politica cancelamento
+        Thiago confirma
+      Cobranca automatizada
+        Fase PROXIMO
+    6. Lista do Ritual
+      Template WhatsApp
+        Modelo pronto
+      Capacidade 30 vagas
+        Definido
+      Confirmacao de vaga
+        Precisa criar
+    7. Guia Preparacao D-3
+      Resumo dos preceitos
+        Conteudo existe
+      Dieta e jejum
+        Conteudo existe
+      O que levar checklist
+        Conteudo existe
+      Mensagem envelope D-3
+        Precisa criar
+      Confirmacao presenca
+        Precisa criar
+    8. Dia do Ritual
+      Sabado 18h
+      Chacara Aurora Austral
+      Ayahuasca Soundhealing
+      Rape Sananga
+      Evento presencial
+    9. Pos-Vivencia D+1
+      Guia Txi Ruas
+        Texto aprovado
+      3 Dias de Ouro
+        Detalhado
+      Cuidado mental
+        Detalhado
+      Grounding
+        Detalhado
+      Sinais de atencao
+        Detalhado
+      Link feedback
+        Form ativo
+      Grupos WhatsApp
+        3 links prontos
+      Cynthia Aurea
+        Definida
+      Mensagem pos
+        Thiago confirma
+      Check-in D+3
+        Precisa definir
+      Retencao proximo ritual
+        Precisa criar
+            </pre>
+        </div>
+    </div>
+
+    <!-- FLUXO SEQUENCIAL -->
+    <div class="diagram-card" id="fluxo">
+        <div class="diagram-card-header">
+            <div class="number">2</div>
+            <h2>Fluxo Sequencial</h2>
+            <p>Etapas conectadas com gatilhos</p>
+        </div>
+        <div class="diagram-card-body">
+            <pre class="mermaid">
+flowchart LR
+    subgraph E1["1. PRIMEIRO CONTATO"]
+        A1["Thiago da boas-vindas"] --> A2["Passa contato"]
+    end
+
+    subgraph E2["2. SISTEMA ASSUME"]
+        B1["Mensagem boas-vindas\nacolhedora"]
+        B2["Apresentacao do\nInstituto"]
+        B3["Menu: FAQ / Anamnese\n/ Valores"]
+    end
+
+    subgraph E3["3. FAQ"]
+        C1["Soundhealing"]
+        C2["O que levar"]
+        C3["Preceitos e dieta"]
+        C4["Cerimonia Tui"]
+        C5["Ayahuasca"]
+        C6["Peia e limpeza"]
+    end
+
+    subgraph E4["4. ANAMNESE"]
+        D1["Pedido de\npreenchimento"]
+        D2["Google Forms"]
+        D3["Lembrete 48h"]
+    end
+
+    subgraph E5["5. PAGAMENTO"]
+        E_1["R$180 antecipado\nR$210 no dia"]
+        E_2["Pix confirmado"]
+        E_3["Lembrete D-1"]
+    end
+
+    subgraph E6["6. LISTA"]
+        F1["Template 30 vagas"]
+        F2["Confirmacao vaga"]
+    end
+
+    subgraph E7["7. PREPARACAO D-3"]
+        G1["Guia completo"]
+        G2["Confirmacao presenca"]
+    end
+
+    subgraph E8["8. RITUAL"]
+        H1["Sabado 18h\nChacara Aurora"]
+    end
+
+    subgraph E9["9. POS"]
+        I1["Guia Txi Ruas"]
+        I2["Feedback"]
+        I3["Grupos WhatsApp"]
+        I4["Cynthia Aurea"]
+        I5["Check-in D+3"]
+        I6["Retencao proximo"]
+    end
+
+    E1 -->|"Thiago passa\no bastao"| E2
+    E2 -->|"Quer saber\nmais"| E3
+    E3 -->|"Interessado"| E4
+    E4 -->|"Form ok"| E5
+    E5 -->|"Pago"| E6
+    E6 -->|"D-3"| E7
+    E7 -->|"Dia"| E8
+    E8 -->|"D+1"| E9
+
+    style E1 fill:#27ae60,color:#fff
+    style E2 fill:#8e44ad,color:#fff
+    style E3 fill:#e67e22,color:#fff
+    style E4 fill:#2980b9,color:#fff
+    style E5 fill:#c0392b,color:#fff
+    style E6 fill:#27ae60,color:#fff
+    style E7 fill:#e67e22,color:#fff
+    style E8 fill:#f39c12,color:#000
+    style E9 fill:#8e44ad,color:#fff
+            </pre>
+        </div>
+    </div>
+
+    <!-- DECISOES -->
+    <div class="diagram-card" id="decisoes">
+        <div class="diagram-card-header">
+            <div class="number">3</div>
+            <h2>Mapa de Decisoes do Participante</h2>
+            <p>Caminhos e bifurcacoes</p>
+        </div>
+        <div class="diagram-card-body">
+            <pre class="mermaid">
+flowchart TD
+    START["Pessoa demonstra interesse"] --> THIAGO["Thiago da boas-vindas pessoais"]
+    THIAGO --> SISTEMA["Sistema assume com boas-vindas"]
+
+    SISTEMA --> Q1{"Quer saber mais\nsobre o ritual?"}
+    Q1 -->|"Sim"| FAQ["Recebe FAQ completo"]
+    Q1 -->|"Ja conhece"| ANAM["Vai pra anamnese direto"]
+
+    FAQ --> Q2{"Ainda tem\nduvidas?"}
+    Q2 -->|"Sim"| THIAGO2["Thiago responde pessoalmente"]
+    Q2 -->|"Nao"| ANAM
+
+    ANAM --> Q3{"Form preenchido?"}
+    Q3 -->|"Sim"| PAG["Recebe valores + Pix"]
+    Q3 -->|"Nao em 48h"| LEMBRA["Lembrete gentil"]
+    LEMBRA --> Q3
+
+    PAG --> Q4{"Pagou?"}
+    Q4 -->|"Sim"| LISTA["Nome na lista - vaga garantida"]
+    Q4 -->|"Nao"| Q5{"Ainda interessado?"}
+    Q5 -->|"Sim"| LEMBRA2["Lembrete D-1 valor antecipado"]
+    Q5 -->|"Nao"| CANCELA["Politica cancelamento pendente"]
+
+    LISTA --> PREP["D-3: Guia de preparacao"]
+    PREP --> CONF["Confirmacao de presenca"]
+    CONF --> RITUAL["Dia do Ritual - Sabado 18h"]
+
+    RITUAL --> POS["D+1: Pos-vivencia"]
+    POS --> CHECK["D+3: Check-in integracao"]
+    CHECK --> RETENCAO["Convite proximo ritual"]
+
+    style START fill:#2980b9,color:#fff
+    style THIAGO fill:#27ae60,color:#fff
+    style SISTEMA fill:#8e44ad,color:#fff
+    style LISTA fill:#27ae60,color:#fff
+    style RITUAL fill:#f39c12,color:#000
+    style POS fill:#8e44ad,color:#fff
+    style CANCELA fill:#c0392b,color:#fff
+            </pre>
+        </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="diagram-card" id="timeline">
+        <div class="diagram-card-header">
+            <div class="number">4</div>
+            <h2>Linha do Tempo</h2>
+            <p>Gatilhos temporais da jornada</p>
+        </div>
+        <div class="diagram-card-body">
+            <pre class="mermaid">
+timeline
+    title Jornada do Participante — Gatilhos Temporais
+    section Primeiro Contato
+        Thiago da boas-vindas : Passa o contato : Sistema envia boas-vindas + menu
+    section Dias Seguintes
+        Participante recebe FAQ : Preenche anamnese : Confirma interesse
+    section Confirmacao
+        Sistema envia valores : Participante faz Pix : Vaga garantida na lista
+    section D-7
+        Lembrete opcional : Confirmacao de presenca
+    section D-3
+        Guia de preparacao : Preceitos dieta jejum : Checklist o que levar
+    section D-1
+        Ultimo dia valor antecipado : Lembrete de pagamento
+    section Dia do Ritual
+        Sabado 18h : Chacara Aurora Austral : Ayahuasca Soundhealing Rape Sananga
+    section D+1
+        Guia Txi Ruas : Feedback Eco da Jornada : Grupos WhatsApp : Cynthia Aurea
+    section D+3
+        Check-in integracao : Sinais de atencao
+    section D+7
+        Retencao proximo ritual : Convite nova vivencia
+            </pre>
+        </div>
+    </div>
+
+    <!-- INVENTARIO -->
+    <div class="diagram-card" id="inventario">
+        <div class="diagram-card-header">
+            <div class="number">5</div>
+            <h2>Inventario de Assets</h2>
+            <p>O que temos, o que falta, o que ta pendente</p>
+        </div>
+        <div class="inventory-grid">
+            <div class="inventory-col">
+                <h3><span class="icon">✅</span> Temos Hoje</h3>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">FAQ Soundhealing</span>
+                    <span class="detail">texto aprovado</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">FAQ O que levar</span>
+                    <span class="detail">texto aprovado</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">FAQ Preceitos e dieta</span>
+                    <span class="detail">texto aprovado</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">FAQ Cerimonia Tui</span>
+                    <span class="detail">texto aprovado</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Guia Integracao Txi Ruas</span>
+                    <span class="detail">completo</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Form Anamnese</span>
+                    <span class="detail">Google Forms ativo</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Form Feedback</span>
+                    <span class="detail">Eco da Jornada ativo</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Valores e Pix</span>
+                    <span class="detail">R$180 / R$210</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Template lista ritual</span>
+                    <span class="detail">30 vagas</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">3 grupos WhatsApp</span>
+                    <span class="detail">links prontos</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Formato convite post</span>
+                    <span class="detail">astrologico</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status green"></div>
+                    <span class="label">Modelo hibrido</span>
+                    <span class="detail">Thiago + sistema</span>
+                </div>
+            </div>
+
+            <div class="inventory-col">
+                <h3><span class="icon">🔴</span> Precisamos Criar</h3>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Mensagem boas-vindas sistema</span>
+                    <span class="detail">etapa 2</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Menu navegacao FAQ</span>
+                    <span class="detail">etapa 2</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Texto o que e Ayahuasca</span>
+                    <span class="detail">etapa 3</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Mensagem pedido anamnese</span>
+                    <span class="detail">etapa 4</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Lembrete anamnese 48h</span>
+                    <span class="detail">etapa 4</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Confirmacao pagamento</span>
+                    <span class="detail">etapa 5</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Lembrete D-1 pagamento</span>
+                    <span class="detail">etapa 5</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Confirmacao vaga lista</span>
+                    <span class="detail">etapa 6</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Envelope D-3 preparacao</span>
+                    <span class="detail">etapa 7</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Confirmacao presenca</span>
+                    <span class="detail">etapa 7</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Envelope D+1 pos-vivencia</span>
+                    <span class="detail">etapa 9</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Check-in D+3 integracao</span>
+                    <span class="detail">etapa 9</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status red"></div>
+                    <span class="label">Retencao proximo ritual</span>
+                    <span class="detail">etapa 9</span>
+                </div>
+            </div>
+
+            <div class="inventory-col">
+                <h3><span class="icon">🟡</span> Pendente com Thiago</h3>
+                <div class="inventory-item">
+                    <div class="status yellow"></div>
+                    <span class="label">Politica de cancelamento</span>
+                    <span class="detail">confirmar regra</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status yellow"></div>
+                    <span class="label">Peia e limpeza no FAQ</span>
+                    <span class="detail">entra ou fica presencial?</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status yellow"></div>
+                    <span class="label">FAQ previo vs presencial</span>
+                    <span class="detail">dilema do condicionamento</span>
+                </div>
+                <div class="inventory-item">
+                    <div class="status yellow"></div>
+                    <span class="label">Formato pos-integracao</span>
+                    <span class="detail">Thiago manda ou sistema?</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Instituto Libelula — Chacara Aurora Austral — Piedade/SP<br>
+    Jornada do Participante v1.0 — Abril 2026
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        themeVariables: {
+            primaryColor: '#6c5ce7',
+            primaryTextColor: '#fff',
+            primaryBorderColor: '#a29bfe',
+            lineColor: '#636e72',
+            secondaryColor: '#2d3436',
+            tertiaryColor: '#1e272e',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px'
+        },
+        mindmap: {
+            padding: 20,
+            useMaxWidth: true
+        },
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis'
+        },
+        timeline: {
+            useMaxWidth: true
+        }
+    });
+</script>
+
+</body>
+</html>

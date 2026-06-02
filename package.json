@@ -1,0 +1,23 @@
+{
+  "name": "instituto-libelula",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TM-Tecnologias-modulares/Instituto_Libelula_Pergaminho_Guardiao.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TM-Tecnologias-modulares/Instituto_Libelula_Pergaminho_Guardiao/issues"
+  },
+  "homepage": "https://github.com/TM-Tecnologias-modulares/Instituto_Libelula_Pergaminho_Guardiao#readme",
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
+}
